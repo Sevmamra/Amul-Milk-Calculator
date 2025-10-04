@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Milk Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --amul-blue: #0066cc;
+            --amul-red: #d9232a;
+            --amul-light-blue: #e6f2ff;
+            --amul-dark-blue: #004a99;
+            --gradient-primary: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+            --gradient-secondary: linear-gradient(135deg, #d9232a 0%, #b31b22 100%);
+            --gradient-light: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --footer-bg: rgba(255, 255, 255, 0.98);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .dark-mode {
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --footer-bg: rgba(15, 23, 42, 0.98);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.25);
+            --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: all 0.4s ease;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 204, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(217, 35, 42, 0.05) 0%, transparent 20%);
+        }
+        
+        .dark-mode body {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 204, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(217, 35, 42, 0.1) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-heavy);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideInDown 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .logo-title-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+        
+        .logo-img {
+            height: 80px;
+            width: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            animation: pulse 2s infinite;
+        }
+        
+        .title-img {
+            height: 70px;
+            width: auto;
+            flex: 1;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        /* Controls Section */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-medium);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        
+        .dark-mode .controls {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .toggle-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input:checked + .slider {
+            background: var(--gradient-primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .dark-mode-btn {
+            background: var(--gradient-light);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-light);
+            transition: all 0.4s ease;
+            font-size: 1.3rem;
+            color: var(--text-color);
+        }
+        
+        .dark-mode .dark-mode-btn {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .dark-mode-btn:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        /* Category Styles */
+        .category-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--amul-blue);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInLeft 0.8s ease-out both;
+        }
+        
+        .category-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--gradient-secondary);
+        }
+        
+        /* Product Card Styles */
+        .product-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.6s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dark-mode .product-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .product-card:hover::before {
+            left: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+        }
+        
+        .product-info {
+            flex-grow: 1;
+        }
+        
+        .product-name {
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .product-details {
+            display: flex;
+            gap: 1.2rem;
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 0.8rem;
+        }
+        
+        .dark-mode .product-details {
+            color: #94a3b8;
+        }
+        
+        .product-price {
+            font-size: 1.3rem;
+            color: var(--amul-blue);
+            font-weight: 700;
+            background: var(--amul-light-blue);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.6rem;
+            display: inline-block;
+        }
+        
+        .dark-mode .product-price {
+            background: rgba(0, 102, 204, 0.2);
+        }
+        
+        .quantity-input-container {
+            position: relative;
+        }
+        
+        .quantity-input {
+            width: 140px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-mode .quantity-input {
+            border: 2px solid #334155;
+        }
+        
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--amul-blue);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quantity-label {
+            display: block;
+            text-align: center;
+            font-size: 1rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .dark-mode .quantity-label {
+            color: #94a3b8;
+        }
+        
+        /* Footer Styles */
+        .footer {
+            position: sticky;
+            bottom: 0;
+            background: var(--footer-bg);
+            backdrop-filter: blur(15px);
+            padding: 1.5rem;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 1.5rem 1.5rem 0 0;
+            margin-top: 3rem;
+            animation: slideInUp 0.8s ease-out;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark-mode .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .total-display {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--amul-red);
+            text-align: center;
+            margin: 0.8rem 0;
+            text-shadow: 0 4px 8px rgba(217, 35, 42, 0.2);
+            transition: all 0.3s ease;
+            letter-spacing: -1px;
+        }
+        
+        .total-label {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 1.2rem 2rem;
+            border-radius: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            border: none;
+            box-shadow: var(--shadow-medium);
+            letter-spacing: -0.5px;
+        }
+        
+        .btn-calculate {
+            background: var(--gradient-primary);
+            color: white;
+            flex-grow: 1;
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 102, 204, 0.4);
+        }
+        
+        .btn-reset {
+            background: var(--gradient-light);
+            color: #475569;
+            width: 70px;
+            height: 70px;
+        }
+        
+        .dark-mode .btn-reset {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-5px) rotate(15deg);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .header-content {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .logo-title-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .logo-img {
+                height: 60px;
+            }
+            
+            .title-img {
+                height: 50px;
+                flex: 1;
+            }
+            
+            .controls {
+                flex-direction: row;
+                align-items: center;
+                padding: 1.2rem;
+            }
+            
+            .product-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            
+            .product-name {
+                font-size: 1.3rem;
+            }
+            
+            .product-details {
+                font-size: 1rem;
+            }
+            
+            .product-price {
+                font-size: 1.2rem;
+            }
+            
+            .quantity-input-container {
+                align-self: flex-end;
+            }
+            
+            .action-buttons {
+                flex-direction: row;
+            }
+            
+            .btn {
+                width: auto;
+            }
+            
+            .btn-reset {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-title-container {
+                gap: 0.8rem;
+            }
+            
+            .logo-img {
+                height: 50px;
+            }
+            
+            .title-img {
+                height: 45px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 1.2rem;
+            }
+            
+            .toggle-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .dark-mode-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .category-title {
+                font-size: 1.5rem;
+            }
+            
+            .total-display {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--amul-dark-blue);
+        }
+        
+        /* Floating Animation for Cards */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        /* Glow Effect */
+        .glow {
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .dark-mode .glow {
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container p-4">
+        <!-- Header Section -->
+        <div class="header floating">
+            <div class="header-content">
+                <div class="logo-title-container">
+                    <img src="logo.png" alt="Amul Logo" class="logo-img">
+                    <img src="header-title.png" alt="Amul Milk Calculator" class="title-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="toggle-container">
+                <span class="toggle-label">Auto Calculate</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-calculate">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button id="dark-mode-btn" class="dark-mode-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <!-- Product Lists -->
+        <div id="product-list" class="mt-8">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+
+    </div>
+
+    <!-- Footer with Total and Buttons -->
+    <div class="footer">
+        <p class="total-label">Total Amount</p>
+        <div id="total-amount" class="total-display">₹ 0.00</div>
+        <div class="action-buttons">
+            <button id="calculate-btn" class="btn btn-calculate">
+                <i class="fas fa-calculator"></i> Calculate Total
+            </button>
+            <button id="reset-btn" class="btn btn-reset">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch products data from JSON file
+            fetch('products.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(products => {
+                    displayProducts(products);
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    // Fallback to default products if JSON fails to load
+                    const defaultProducts = [
+                        // Milk Category
+                        { name: 'Buffalo Milk', size: '24x500 ml Pouch', price: 865.08, category: 'Milk' },
+                        { name: 'Buffalo Milk', size: '12x1 L Pouch', price: 865.08, category: 'Milk' },
+                        { name: 'Gold', size: '24 x 500 ml Pouch', price: 794.40, category: 'Milk' },
+                        { name: 'Gold', size: '12 x 1 Ltr Pouch', price: 782.40, category: 'Milk' },
+                        { name: 'Gold', size: '6x2 L Pouch Crate', price: 763.20, category: 'Milk' },
+                        { name: 'Gold', size: '2 x 6 Ltr Pouch', price: 751.32, category: 'Milk' },
+                        { name: 'Shakti', size: '24 x 500ml', price: 723.60, category: 'Milk' },
+                        { name: 'T-Special', size: '24 x 500 ml Pouch', price: 747.00, category: 'Milk' },
+                        { name: 'T-Special', size: '12 x 1 Ltr. Pouch', price: 735.00, category: 'Milk' },
+                        { name: 'Cow Milk', size: '24 x 500 ml. Pouch', price: 674.40, category: 'Milk' },
+                        { name: 'Taaza', size: '24 x 500 ml. Pouch', price: 650.76, category: 'Milk' },
+                        { name: 'Taaza', size: '12 x 1 ltr. Pouch', price: 638.76, category: 'Milk' },
+                        { name: 'Taaza', size: '2 x 6 ltr. Pouch', price: 597.84, category: 'Milk' },
+                        { name: 'Taaza', size: '60x160 ml Pouch', price: 552.00, category: 'Milk' },
+                        { name: 'Chai Maaza', size: '24 x 500 ml. Pouch', price: 650.76, category: 'Milk' },
+                        { name: 'Chai Maaza', size: '12 x 1 ltr. Pouch', price: 638.76, category: 'Milk' },
+                        { name: 'Slim-n-Trim', size: '24 x 500 ml. Pouch', price: 579.60, category: 'Milk' },
+                        { name: 'Slim-n-Trim', size: '12 x 1 L. Pouch', price: 567.60, category: 'Milk' },
+
+                        // Dahi Category
+                        { name: 'Masti Dahi Cup', size: '24x200 Gm Carton', price: 515.52, category: 'Dahi' },
+                        { name: 'Masti Dahi Cup', size: '12x400 Gm Carton', price: 504.78, category: 'Dahi' },
+                        { name: 'Mishti Doi Cup', size: '48x80 gm Carton', price: 612.00, category: 'Dahi' },
+                        { name: 'Masti Dahi Pouch', size: '2X5 Kg Crate', price: 679.00, category: 'Dahi' },
+                        { name: 'Lite Dahi Pouch', size: '2X5 Kg Crate', price: 535.57, category: 'Dahi' },
+                        { name: 'Masti Dahi', size: '5 Kg Matka', price: 367.55, category: 'Dahi' },
+                        { name: 'Masti Dahi Pouch', size: '30x390 Gm Crate', price: 950.25, category: 'Dahi' },
+                        { name: 'Masti Dahi Pouch', size: '12x1 Kg Crate', price: 863.94, category: 'Dahi' },
+                        { name: 'Masti Dahi Pouch', size: '60x200 gm Crate', price: 1080.00, category: 'Dahi' },
+                        { name: 'Masti Dahi Pouch', size: '6x2 Kg Crate', price: 803.52, category: 'Dahi' },
+                        { name: 'A2 Buffalo Milk Dahi', size: '24x200 Gm Cup', price: 672.00, category: 'Dahi' },
+                        { name: 'A2 Buffalo Milk Dahi', size: '12x400 Gm Cup', price: 624.00, category: 'Dahi' },
+                        { name: 'Dahi Pouch', size: '16x800 Gm Crate', price: 745.60, category: 'Dahi' },
+                        { name: 'Masti Dahi', size: '2KgTub (2 Unit)', price: 360.00, category: 'Dahi' },
+
+                        // Buttermilk Category
+                        { name: 'Pro. Buttermilk', size: '40x300 ml Pouch', price: 372.00, category: 'Buttermilk' },
+                        { name: 'Pro. Buttermilk', size: '26x440 ml Pouch', price: 358.80, category: 'Buttermilk' },
+                        { name: 'Pro. Buttermilk', size: '16x680 ml Pouch', price: 300.80, category: 'Buttermilk' },
+                        { name: 'Pro. Masala Chaas', size: '40x280 ml Pouch', price: 360.00, category: 'Buttermilk' },
+                        { name: 'Pro. Tadka Chaas', size: '40x280 ml Pouch', price: 360.00, category: 'Buttermilk' },
+                        { name: 'Satva Buttermilk', size: '30x400 ml Pouch', price: 270.00, category: 'Buttermilk' },
+                        { name: 'Buttermilk', size: '2*6 ltr Pouch', price: 316.80, category: 'Buttermilk' },
+                    ];
+                    displayProducts(defaultProducts);
+                });
+
+            const productListDiv = document.getElementById('product-list');
+            const darkModeBtn = document.getElementById('dark-mode-btn');
+            const autoCalculateToggle = document.getElementById('auto-calculate');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const totalAmountDiv = document.getElementById('total-amount');
+            
+            // Dark mode functionality
+            darkModeBtn.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const icon = darkModeBtn.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+            
+            // Function to display products
+            function displayProducts(products) {
+                // Products ko category ke hisab se group karna
+                const groupedProducts = products.reduce((acc, product) => {
+                    const category = product.category;
+                    if (!acc[category]) {
+                        acc[category] = [];
+                    }
+                    acc[category].push(product);
+                    return acc;
+                }, {});
+
+                // Har category aur uske products ko page par dikhana
+                for (const category in groupedProducts) {
+                    const categoryTitle = document.createElement('h2');
+                    categoryTitle.className = 'category-title';
+                    categoryTitle.textContent = category;
+                    productListDiv.appendChild(categoryTitle);
+
+                    groupedProducts[category].forEach((product, index) => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        
+                        productCard.innerHTML = `
+                            <div class="product-info">
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-details">
+                                    <span class="product-size">${product.size}</span>
+                                </div>
+                                <div class="product-price">Rate: ₹${product.price.toFixed(2)}</div>
+                            </div>
+                            <div class="quantity-input-container">
+                                <input type="number" class="quantity-input" data-price="${product.price}" placeholder="0" min="0">
+                                <span class="quantity-label">Crate</span>
+                            </div>
+                        `;
+                        
+                        // Staggered animation delay
+                        productCard.style.animationDelay = `${index * 0.05}s`;
+                        productListDiv.appendChild(productCard);
+                    });
+                }
+
+                // Initialize event listeners after products are loaded
+                initializeEventListeners();
+            }
+
+            // Initialize event listeners
+            function initializeEventListeners() {
+                // Calculate function
+                function calculateTotal() {
+                    let total = 0;
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    
+                    quantityInputs.forEach(input => {
+                        const quantity = parseFloat(input.value) || 0;
+                        const price = parseFloat(input.dataset.price);
+                        if (quantity > 0) {
+                            total += quantity * price;
+                        }
+                    });
+
+                    // Animation effect for total update
+                    totalAmountDiv.classList.add('glow');
+                    totalAmountDiv.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        totalAmountDiv.style.transform = 'scale(1)';
+                        totalAmountDiv.classList.remove('glow');
+                    }, 300);
+                    
+                    totalAmountDiv.textContent = `₹ ${total.toFixed(2)}`;
+                }
+
+                // Calculate button ka function
+                calculateBtn.addEventListener('click', calculateTotal);
+
+                // Reset button ka function
+                resetBtn.addEventListener('click', function () {
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    quantityInputs.forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Animation effect for reset
+                    totalAmountDiv.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        totalAmountDiv.style.transform = 'scale(1)';
+                        totalAmountDiv.textContent = '₹ 0.00';
+                    }, 300);
+                });
+                
+                // Auto-calculate when input changes if enabled
+                document.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('quantity-input') && autoCalculateToggle.checked) {
+                        calculateTotal();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
