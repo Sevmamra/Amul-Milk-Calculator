@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Milk Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f5ff; /* Amul blue light shade */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #004a99; /* Amul dark blue */
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .product-info {
+            flex-grow: 1;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .product-price {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .quantity-input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .quantity-input:focus {
+            outline: none;
+            border-color: #004a99;
+            box-shadow: 0 0 0 2px rgba(0, 74, 153, 0.2);
+        }
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #004a99;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5rem;
+        }
+        .footer {
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem 1rem 0 0;
+        }
+        .total-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d9232a; /* Amul Red */
+            text-align: center;
+        }
+        .total-label {
+            font-size: 1rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-calculate {
+            background-color: #004a99; /* Amul blue */
+            color: white;
+        }
+        .btn-calculate:hover {
+            background-color: #003a7a;
+        }
+        .btn-reset {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .btn-reset:hover {
+            background-color: #d1d1d1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container p-4">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>Amul Milk Calculator</h1>
+            <p>Mother Milk Palace</p>
+        </div>
+
+        <!-- Product Lists -->
+        <div id="product-list" class="mt-8">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+
+    </div>
+
+    <!-- Footer with Total and Buttons -->
+    <div class="footer">
+        <p class="total-label">Total amount</p>
+        <div id="total-amount" class="total-display">₹ 0.00</div>
+        <div class="action-buttons">
+            <button id="calculate-btn" class="btn btn-calculate">Calculate Total</button>
+            <button id="reset-btn" class="btn btn-reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Yahan sabhi products ki list hai, unke naam, price aur category ke saath.
+            // Aap is list ko aasani se badal sakte hain.
+            const products = [
+                // Milk (Doodh) Category
+                { name: 'Amul Buffalo Milk 24x500 ml Pouch', price: 865.08, category: 'Milk (दूध)' },
+                { name: 'Amul Buffalo Milk 12x1 L Pouch', price: 865.08, category: 'Milk (दूध)' },
+                { name: 'Amul Gold 24 x 500 ml Pouch', price: 794.40, category: 'Milk (दूध)' },
+                { name: 'Amul Gold 12 x 1 Ltr Pouch', price: 782.40, category: 'Milk (दूध)' },
+                { name: 'Amul Gold 6x2 L Pouch Crate', price: 763.20, category: 'Milk (दूध)' },
+                { name: 'Amul Gold 2 x 6 Ltr Pouch', price: 751.32, category: 'Milk (दूध)' },
+                { name: 'Amul Shakti 24 x 500ml', price: 723.60, category: 'Milk (दूध)' },
+                { name: 'Amul T-Special 24 x 500 ml Pouch', price: 747.00, category: 'Milk (दूध)' },
+                { name: 'Amul T-Special 12 x 1 Ltr. Pouch', price: 735.00, category: 'Milk (दूध)' },
+                { name: 'Amul Cow Milk 24 x 500 ml. Pouch', price: 674.40, category: 'Milk (दूध)' },
+                { name: 'Amul Taaza 24 x 500 ml. Pouch', price: 650.76, category: 'Milk (दूध)' },
+                { name: 'Amul Taaza 12 x 1 ltr. Pouch', price: 638.76, category: 'Milk (दूध)' },
+                { name: 'Amul Taaza 2 x 6 ltr. Pouch', price: 597.84, category: 'Milk (दूध)' },
+                { name: 'Amul Taaza 60x160 ml Pouch', price: 552.00, category: 'Milk (दूध)' },
+                { name: 'Amul Chai Maaza 24 x 500 ml. Pouch', price: 650.76, category: 'Milk (दूध)' },
+                { name: 'Amul Chai Maaza 12 x 1 ltr. Pouch', price: 638.76, category: 'Milk (दूध)' },
+                { name: 'Amul Slim-n-Trim 24 x 500 ml. Pouch', price: 579.60, category: 'Milk (दूध)' },
+                { name: 'Amul Slim-n-Trim 12 x 1 L. Pouch', price: 567.60, category: 'Milk (दूध)' },
+
+                // Dahi Category
+                { name: 'Amul Masti Dahi Cup 24x200 Gm Carton', price: 515.52, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Cup 12x400 Gm Carton', price: 504.78, category: 'Dahi (दही)' },
+                { name: 'Amul Mishti Doi Cup 48x80 gm Carton', price: 612.00, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Pouch 2X5 Kg Crate', price: 679.00, category: 'Dahi (दही)' },
+                { name: 'Amul Lite Dahi Pouch 2X5 Kg Crate', price: 535.57, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi 5 Kg Matka', price: 367.55, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Pouch 30x390 Gm Crate', price: 950.25, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Pouch 12x1 Kg Crate', price: 863.94, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Pouch 60x200 gm Crate', price: 1080.00, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi Pouch 6x2 Kg Crate', price: 803.52, category: 'Dahi (दही)' },
+                { name: 'Amul A2 Buffalo Milk Dahi 24x200 Gm Cup', price: 672.00, category: 'Dahi (दही)' },
+                { name: 'Amul A2 Buffalo Milk Dahi 12x400 Gm Cup', price: 624.00, category: 'Dahi (दही)' },
+                { name: 'Amul Dahi Pouch 16x800 Gm Crate', price: 745.60, category: 'Dahi (दही)' },
+                { name: 'Amul Masti Dahi 2KgTub (2 Unit)', price: 360.00, category: 'Dahi (दही)' },
+
+                // Buttermilk / Chaas Category
+                { name: 'Amul Pro. Buttermilk 40x300 ml Pouch', price: 372.00, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Pro. Buttermilk 26x440 ml Pouch', price: 358.80, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Pro. Buttermilk 16x680 ml Pouch', price: 300.80, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Pro. Masala Chaas 40x280 ml Pouch', price: 360.00, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Pro. Tadka Chaas 40x280 ml Pouch', price: 360.00, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Satva Buttermilk 30x400 ml Pouch', price: 270.00, category: 'Buttermilk / Chaas (छाछ)' },
+                { name: 'Amul Buttermilk 2*6 ltr Pouch', price: 316.80, category: 'Buttermilk / Chaas (छाछ)' },
+            ];
+
+            const productListDiv = document.getElementById('product-list');
+            
+            // Products ko category ke hisab se group karna
+            const groupedProducts = products.reduce((acc, product) => {
+                const category = product.category;
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(product);
+                return acc;
+            }, {});
+
+            // Har category aur uske products ko page par dikhana
+            for (const category in groupedProducts) {
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category;
+                productListDiv.appendChild(categoryTitle);
+
+                groupedProducts[category].forEach((product, index) => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    
+                    productCard.innerHTML = `
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">Rate: ₹${product.price.toFixed(2)}</div>
+                        </div>
+                        <input type="number" class="quantity-input" data-price="${product.price}" placeholder="Crate">
+                    `;
+                    productListDiv.appendChild(productCard);
+                });
+            }
+
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const totalAmountDiv = document.getElementById('total-amount');
+
+            // Calculate button ka function
+            calculateBtn.addEventListener('click', function () {
+                let total = 0;
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                
+                quantityInputs.forEach(input => {
+                    const quantity = parseFloat(input.value) || 0;
+                    const price = parseFloat(input.dataset.price);
+                    if (quantity > 0) {
+                        total += quantity * price;
+                    }
+                });
+
+                totalAmountDiv.textContent = `₹ ${total.toFixed(2)}`;
+            });
+
+            // Reset button ka function
+            resetBtn.addEventListener('click', function () {
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                quantityInputs.forEach(input => {
+                    input.value = '';
+                });
+                totalAmountDiv.textContent = '₹ 0.00';
+            });
+        });
+    </script>
+</body>
+</html>
