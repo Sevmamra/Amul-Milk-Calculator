@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Milk Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --amul-blue: #0066cc;
+            --amul-red: #d9232a;
+            --amul-green: #22c55e;
+            --amul-yellow: #f59e0b;
+            --amul-light-blue: #e6f2ff;
+            --gradient-primary: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+            --gradient-secondary: linear-gradient(135deg, #d9232a 0%, #b31b22 100%);
+            --gradient-success: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            
+            /* Light Mode Variables */
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --footer-bg: rgba(255, 255, 255, 0.98);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --control-bg: var(--card-bg);
+            --category-title-color: var(--amul-blue);
+            --quantity-stepper-bg: var(--amul-light-blue);
+            --quantity-btn-color: var(--amul-blue);
+            --history-border-color: #e2e8f0;
+            --search-bg: #ffffff;
+        }
+        
+        .dark-mode {
+            /* Dark Mode Variables */
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --footer-bg: rgba(15, 23, 42, 0.98);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.25);
+            --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.3);
+            --control-bg: var(--card-bg);
+            --category-title-color: #60a5fa;
+            --quantity-stepper-bg: #1e293b;
+            --quantity-btn-color: #93c5fd;
+            --history-border-color: #334155;
+            --search-bg: #1e293b;
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.4s ease;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 204, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(217, 35, 42, 0.05) 0%, transparent 20%);
+        }
+        
+        .dark-mode body {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 204, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(217, 35, 42, 0.1) 0%, transparent 20%);
+        }
+        
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            padding: 1.5rem; 
+        }
+        
+        /* Header Styles */
+        .header { 
+            background: var(--gradient-primary); 
+            color: white; 
+            padding: 2rem; 
+            border-radius: 1.5rem; 
+            box-shadow: var(--shadow-heavy); 
+            margin-bottom: 2rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            animation: slideInDown 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .logo-title-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            position: relative;
+        }
+        
+        .logo-img { 
+            height: 80px; 
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); 
+            animation: pulse 2s infinite;
+        }
+        
+        .title-img { 
+            height: 70px; 
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 1.5rem;
+            position: relative;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        /* Controls Section */
+        .controls { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 1.5rem; 
+            margin-bottom: 2rem; 
+            align-items: center; 
+            background: var(--control-bg); 
+            padding: 1.5rem; 
+            border-radius: 1.5rem; 
+            box-shadow: var(--shadow-medium);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        
+        .dark-mode .controls {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .toggle-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.8rem; 
+        }
+        
+        .toggle-label { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+        }
+        
+        .toggle-switch { 
+            position: relative; 
+            display: inline-block; 
+            width: 60px; 
+            height: 30px; 
+        }
+        
+        .toggle-switch input { 
+            opacity: 0; 
+            width: 0; 
+            height: 0; 
+        }
+        
+        .slider { 
+            position: absolute; 
+            cursor: pointer; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background-color: #cbd5e1; 
+            transition: .4s; 
+            border-radius: 34px; 
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .slider:before { 
+            position: absolute; 
+            content: ""; 
+            height: 22px; 
+            width: 22px; 
+            left: 4px; 
+            bottom: 4px; 
+            background-color: white; 
+            transition: .4s; 
+            border-radius: 50%; 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input:checked + .slider { 
+            background: var(--gradient-primary); 
+        }
+        
+        input:checked + .slider:before { 
+            transform: translateX(30px); 
+        }
+        
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #cbd5e1;
+            background: var(--search-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .search-input {
+            border: 1px solid #475569;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--amul-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .btn-icon { 
+            background: var(--gradient-primary); 
+            color: white; 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 0.75rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .btn-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        /* Category Styles */
+        .category-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 1.5rem; 
+            background: var(--card-bg); 
+            border-radius: 1.5rem; 
+            margin-top: 2.5rem; 
+            margin-bottom: 1.5rem; 
+            box-shadow: var(--shadow-light); 
+            cursor: pointer; 
+            user-select: none; 
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--category-title-color);
+            animation: fadeInLeft 0.8s ease-out both;
+        }
+        
+        .category-header:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .category-title { 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            color: var(--category-title-color); 
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .category-count {
+            background: var(--category-title-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .category-toggle-icon { 
+            transition: transform 0.3s ease; 
+            font-size: 1.2rem;
+            color: var(--category-title-color);
+        }
+        
+        .category-header.collapsed .category-toggle-icon { 
+            transform: rotate(-90deg); 
+        }
+        
+        .products-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem; 
+            max-height: 2000px; 
+            overflow: hidden; 
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out; 
+            opacity: 1; 
+        }
+        
+        .products-container.collapsed { 
+            max-height: 0; 
+            opacity: 0; 
+        }
+        
+        /* Product Card Styles */
+        .product-card { 
+            background: var(--card-bg); 
+            border-radius: 1.5rem; 
+            padding: 1.5rem; 
+            box-shadow: var(--shadow-light); 
+            display: flex; 
+            flex-direction: column;
+            gap: 1.5rem; 
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+        
+        .dark-mode .product-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .product-card:hover::before {
+            left: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+        }
+        
+        .product-info { 
+            flex-grow: 1; 
+        }
+        
+        .product-name { 
+            font-weight: 700; 
+            font-size: 1.3rem; 
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .product-size { 
+            color: #64748b;
+            font-size: 1rem;
+        }
+        
+        .dark-mode .product-size {
+            color: #94a3b8;
+        }
+        
+        .product-price { 
+            color: var(--category-title-color); 
+            font-weight: 700; 
+            font-size: 1.3rem;
+            background: var(--quantity-stepper-bg);
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.6rem;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .quantity-stepper { 
+            display: flex; 
+            align-items: center; 
+            background-color: var(--quantity-stepper-bg); 
+            border-radius: 0.75rem; 
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .quantity-btn { 
+            border: none; 
+            background: transparent; 
+            color: var(--quantity-btn-color); 
+            font-size: 1.2rem; 
+            width: 45px; 
+            height: 45px; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .quantity-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-mode .quantity-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .quantity-display { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            width: 50px; 
+            text-align: center; 
+        }
+        
+        .quantity-total {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--amul-red);
+        }
+        
+        /* Footer Styles */
+        .footer { 
+            position: sticky; 
+            bottom: 0; 
+            background: var(--footer-bg); 
+            padding: 1.5rem; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1); 
+            border-radius: 1.5rem 1.5rem 0 0; 
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 3rem;
+            animation: slideInUp 0.8s ease-out;
+        }
+        
+        .dark-mode .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .total-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .total-label { 
+            font-size: 1.3rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        
+        .total-amount { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            color: var(--amul-red); 
+            text-shadow: 0 4px 8px rgba(217, 35, 42, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .action-buttons { 
+            display: flex; 
+            gap: 1rem; 
+        }
+        
+        .btn { 
+            padding: 1rem 1.5rem; 
+            border-radius: 0.75rem; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            text-align: center; 
+            cursor: pointer; 
+            border: none; 
+            box-shadow: var(--shadow-light); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            transition: all 0.3s ease;
+            letter-spacing: -0.5px;
+        }
+        
+        .btn:active { 
+            transform: scale(0.95); 
+        }
+        
+        .btn-calculate { 
+            background: var(--gradient-primary); 
+            color: white; 
+            flex-grow: 1; 
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .btn-reset {
+            background: var(--gradient-warning);
+            color: white;
+        }
+        
+        .btn-save {
+            background: var(--gradient-success);
+            color: white;
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+        
+        /* History Modal */
+        .history-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s ease; 
+            backdrop-filter: blur(5px);
+        }
+        
+        .history-modal.visible { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        .history-content { 
+            background: var(--bg-color); 
+            padding: 2rem; 
+            border-radius: 1.5rem; 
+            width: 90%; 
+            max-width: 500px; 
+            box-shadow: var(--shadow-heavy); 
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: zoomIn 0.3s ease;
+        }
+        
+        .history-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .history-title { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+        }
+        
+        #close-history { 
+            background: none; 
+            border: none; 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        #close-history:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .history-list-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 1rem 0; 
+            border-bottom: 1px solid var(--history-border-color); 
+            transition: all 0.2s ease;
+        }
+        
+        .history-list-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .dark-mode .history-list-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .history-list-item:last-child { 
+            border-bottom: none; 
+        }
+        
+        .history-date {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .history-day {
+            font-weight: 600;
+        }
+        
+        .history-full-date {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .dark-mode .history-full-date {
+            color: #94a3b8;
+        }
+        
+        /* Toast Notification */
+        .toast { 
+            position: fixed; 
+            bottom: 120px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--gradient-success); 
+            color: white; 
+            padding: 1rem 2rem; 
+            border-radius: 0.75rem; 
+            z-index: 1001; 
+            opacity: 0; 
+            transition: opacity 0.3s, bottom 0.3s; 
+            box-shadow: var(--shadow-medium);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast.show { 
+            opacity: 1; 
+            bottom: 140px; 
+        }
+        
+        /* Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container { 
+                padding: 1rem; 
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .header-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+            
+            .stat-box {
+                min-width: auto;
+                flex: 1;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 1.2rem;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .products-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .total-amount { 
+                font-size: 2rem; 
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-img { 
+                height: 60px; 
+            }
+            
+            .title-img { 
+                height: 50px; 
+            }
+            
+            .header-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+        
+        /* Floating Animation */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--amul-blue);
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="container pb-40">
+        <!-- Header Section -->
+        <div class="header floating">
+            <div class="logo-title-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Amul_logo.svg/1200px-Amul_logo.svg.png" alt="Amul Logo" class="logo-img">
+                <img src="https://amul.com/files/images/amul-the-taste-of-india.png" alt="Amul Title" class="title-img">
+            </div>
+            <div class="header-stats">
+                <div class="stat-box">
+                    <span class="stat-value" id="total-items">0</span>
+                    <span class="stat-label">Items</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="total-crates">0</span>
+                    <span class="stat-label">Crates</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="savings">0%</span>
+                    <span class="stat-label">Savings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="toggle-container">
+                <span class="toggle-label">Auto Calculate</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-calculate" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+            </div>
+            
+            <div class="control-buttons">
+                <button id="theme-toggle-btn" class="btn-icon"><i class="fas fa-sun"></i></button>
+                <button id="export-btn" class="btn-icon" title="Export Bill"><i class="fas fa-file-export"></i></button>
+            </div>
+        </div>
+
+        <!-- Product Lists -->
+        <div id="product-list"></div>
+    </div>
+
+    <!-- Footer with Total and Buttons -->
+    <div class="footer">
+        <div class="total-container">
+            <span class="total-label">Total Amount:</span>
+            <span id="total-amount" class="total-amount">₹ 0.00</span>
+        </div>
+        <div class="action-buttons">
+            <button id="reset-btn" class="btn btn-reset"><i class="fas fa-redo"></i> Reset</button>
+            <button id="calculate-btn" class="btn btn-calculate hidden"><i class="fas fa-calculator"></i> Calculate</button>
+            <button id="save-btn" class="btn btn-save"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+    
+    <!-- History Modal -->
+    <div id="history-modal" class="history-modal">
+        <div class="history-content">
+            <div class="history-header">
+                <h2 class="history-title">Saved History</h2>
+                <button id="close-history">&times;</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="save-toast" class="toast"><i class="fas fa-check-circle"></i> Amount Saved!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Element selections
+            const productListDiv = document.getElementById('product-list');
+            const autoCalculateToggle = document.getElementById('auto-calculate');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const totalAmountSpan = document.getElementById('total-amount');
+            const historyModal = document.getElementById('history-modal');
+            const closeHistoryBtn = document.getElementById('close-history');
+            const historyListDiv = document.getElementById('history-list');
+            const saveToast = document.getElementById('save-toast');
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const themeIcon = themeToggleBtn.querySelector('i');
+            const searchInput = document.getElementById('search-input');
+            const exportBtn = document.getElementById('export-btn');
+            const totalItemsSpan = document.getElementById('total-items');
+            const totalCratesSpan = document.getElementById('total-crates');
+            const savingsSpan = document.getElementById('savings');
+
+            // Enhanced product data with more details
+            const productsData = [
+                { name: 'Buffalo Milk', size: '24x500 ml Pouch', price: 865.08, category: 'Milk', popular: true },
+                { name: 'Gold', size: '24 x 500 ml Pouch', price: 794.40, category: 'Milk', popular: true },
+                { name: 'Shakti', size: '24 x 500ml', price: 723.60, category: 'Milk', popular: false },
+                { name: 'Taaza', size: '24 x 500 ml Pouch', price: 650.76, category: 'Milk', popular: true },
+                { name: 'Cow Milk', size: '24 x 500 ml Pouch', price: 674.40, category: 'Milk', popular: false },
+                { name: 'Masti Dahi Cup', size: '24x200 Gm Carton', price: 515.52, category: 'Dahi', popular: true },
+                { name: 'Mishti Doi Cup', size: '48x80 gm Carton', price: 612.00, category: 'Dahi', popular: true },
+                { name: 'Masti Dahi Pouch', size: '12x1 Kg Crate', price: 863.94, category: 'Dahi', popular: false },
+                { name: 'Pro. Buttermilk', size: '40x300 ml Pouch', price: 372.00, category: 'Buttermilk', popular: true },
+                { name: 'Pro. Masala Chaas', size: '40x280 ml Pouch', price: 360.00, category: 'Buttermilk', popular: false },
+                { name: 'Satva Buttermilk', size: '30x400 ml Pouch', price: 270.00, category: 'Buttermilk', popular: false },
+                { name: 'Butter', size: '100 Gm Pouch', price: 58.00, category: 'Butter & Cheese', popular: true },
+                { name: 'Cheese Slice', size: '24x20 Gm Pack', price: 240.00, category: 'Butter & Cheese', popular: true },
+                { name: 'Paneer', size: '200 Gm Pack', price: 90.00, category: 'Butter & Cheese', popular: true },
+            ];
+            
+            // --- Core Functions ---
+            function displayProducts(products) {
+                const grouped = products.reduce((acc, p) => {
+                    if (!acc[p.category]) acc[p.category] = [];
+                    acc[p.category].push(p);
+                    return acc;
+                }, {});
+                
+                let html = '';
+                for (const [category, items] of Object.entries(grouped)) {
+                    html += `
+                        <div class="category-header" data-category="${category}">
+                            <h2 class="category-title">
+                                ${category} Products
+                                <span class="category-count">${items.length}</span>
+                            </h2>
+                            <i class="fas fa-chevron-down category-toggle-icon"></i>
+                        </div>
+                        <div class="products-container" data-category-content="${category}">
+                            ${items.map(p => `
+                                <div class="product-card" data-price="${p.price}" data-name="${p.name}" data-category="${p.category}">
+                                    <div class="product-info">
+                                        <div class="product-name">${p.name} ${p.popular ? '<i class="fas fa-star" style="color: var(--amul-yellow); font-size: 0.9em;"></i>' : ''}</div>
+                                        <div class="product-details">
+                                            <span class="product-size">${p.size}</span>
+                                            <span class="product-price">₹${p.price.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="quantity-controls">
+                                        <div class="quantity-stepper">
+                                            <button class="quantity-btn minus-btn"><i class="fas fa-minus"></i></button>
+                                            <span class="quantity-display">0</span>
+                                            <button class="quantity-btn plus-btn"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                        <div class="quantity-total">₹0</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                productListDiv.innerHTML = html;
+                updateStats();
+            }
+
+            function calculateTotal() {
+                let total = 0;
+                let totalItems = 0;
+                let totalCrates = 0;
+                
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const quantity = parseInt(card.querySelector('.quantity-display').textContent);
+                    const price = parseFloat(card.dataset.price);
+                    const itemTotal = quantity * price;
+                    
+                    if (quantity > 0) {
+                        totalItems++;
+                        totalCrates += quantity;
+                        total += itemTotal;
+                        
+                        // Update individual product total
+                        card.querySelector('.quantity-total').textContent = `₹${itemTotal.toFixed(2)}`;
+                    } else {
+                        card.querySelector('.quantity-total').textContent = `₹0`;
+                    }
+                });
+                
+                totalAmountSpan.textContent = `₹ ${total.toFixed(2)}`;
+                updateStats(totalItems, totalCrates, total);
+                
+                // Add animation to total when it changes
+                totalAmountSpan.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    totalAmountSpan.style.transform = 'scale(1)';
+                }, 200);
+            }
+            
+            function updateStats(items = 0, crates = 0, total = 0) {
+                totalItemsSpan.textContent = items;
+                totalCratesSpan.textContent = crates;
+                
+                // Calculate savings (example: 5% of total)
+                const savings = total > 0 ? (total * 0.05).toFixed(2) : 0;
+                savingsSpan.textContent = total > 0 ? '5%' : '0%';
+            }
+            
+            function toggleCalculateButton() {
+                calculateBtn.classList.toggle('hidden', autoCalculateToggle.checked);
+            }
+
+            // --- Search Functionality ---
+            function filterProducts(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                const allProducts = document.querySelectorAll('.product-card');
+                const categories = {};
+                
+                allProducts.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const category = card.dataset.category;
+                    const isVisible = name.includes(searchLower);
+                    
+                    card.style.display = isVisible ? 'flex' : 'none';
+                    
+                    if (!categories[category]) categories[category] = 0;
+                    if (isVisible) categories[category]++;
+                });
+                
+                // Update category visibility and counts
+                document.querySelectorAll('.category-header').forEach(header => {
+                    const category = header.dataset.category;
+                    const content = document.querySelector(`.products-container[data-category-content="${category}"]`);
+                    const countElement = header.querySelector('.category-count');
+                    
+                    if (categories[category] > 0) {
+                        header.style.display = 'flex';
+                        content.style.display = 'grid';
+                        countElement.textContent = categories[category];
+                    } else {
+                        header.style.display = 'none';
+                        content.style.display = 'none';
+                    }
+                });
+            }
+
+            // --- Theme Management ---
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            }
+
+            // --- Save & History Logic ---
+            let pressTimer;
+            let longPressTriggered = false;
+            
+            saveBtn.addEventListener('mousedown', () => {
+                longPressTriggered = false;
+                pressTimer = window.setTimeout(() => {
+                    longPressTriggered = true;
+                    showHistory();
+                }, 800);
+            });
+            
+            saveBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            saveBtn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+            
+            saveBtn.addEventListener('click', () => {
+                if (!longPressTriggered) {
+                    saveCurrentAmount();
+                }
+            });
+            
+            function getHistory() {
+                const history = JSON.parse(localStorage.getItem('amulCalcHistory')) || [];
+                const tenDaysAgo = new Date();
+                tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+                const recentHistory = history.filter(item => new Date(item.date) > tenDaysAgo);
+                if (history.length !== recentHistory.length) {
+                    localStorage.setItem('amulCalcHistory', JSON.stringify(recentHistory));
+                }
+                return recentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            function saveCurrentAmount() {
+                const totalValue = parseFloat(totalAmountSpan.textContent.replace('₹ ', ''));
+                if (totalValue <= 0) return;
+
+                const history = getHistory();
+                history.unshift({ 
+                    amount: totalValue, 
+                    date: new Date().toISOString(),
+                    items: getSelectedProducts()
+                });
+                localStorage.setItem('amulCalcHistory', JSON.stringify(history));
+                
+                saveToast.classList.add('show');
+                setTimeout(() => saveToast.classList.remove('show'), 2000);
+            }
+            
+            function getSelectedProducts() {
+                const selected = [];
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const quantity = parseInt(card.querySelector('.quantity-display').textContent);
+                    if (quantity > 0) {
+                        selected.push({
+                            name: card.dataset.name,
+                            quantity: quantity,
+                            price: parseFloat(card.dataset.price)
+                        });
+                    }
+                });
+                return selected;
+            }
+
+            function showHistory() {
+                const history = getHistory();
+                historyListDiv.innerHTML = history.length === 0 
+                    ? '<p style="text-align: center; padding: 2rem; color: #64748b;">No saved records found.</p>'
+                    : history.map(item => {
+                        const date = new Date(item.date);
+                        const day = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                        const fullDate = date.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+                        
+                        return `
+                            <div class="history-list-item">
+                                <div class="history-date">
+                                    <span class="history-day">${day}</span>
+                                    <span class="history-full-date">${fullDate}</span>
+                                </div>
+                                <strong>₹ ${item.amount.toFixed(2)}</strong>
+                            </div>
+                        `;
+                    }).join('');
+                historyModal.classList.add('visible');
+            }
+
+            // --- Export Functionality ---
+            function exportBill() {
+                const totalValue = parseFloat(totalAmountSpan.textContent.replace('₹ ', ''));
+                if (totalValue <= 0) {
+                    alert('Please add some items to export bill.');
+                    return;
+                }
+                
+                const selectedProducts = getSelectedProducts();
+                let billContent = `AMUL MILK CALCULATOR - BILL\n`;
+                billContent += `Generated on: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+                billContent += `ITEMS:\n`;
+                billContent += `----------------------------------------\n`;
+                
+                selectedProducts.forEach(product => {
+                    billContent += `${product.name} x ${product.quantity} = ₹${(product.quantity * product.price).toFixed(2)}\n`;
+                });
+                
+                billContent += `----------------------------------------\n`;
+                billContent += `TOTAL: ₹${totalValue.toFixed(2)}\n`;
+                billContent += `----------------------------------------\n`;
+                billContent += `Thank you for using Amul Milk Calculator!`;
+                
+                // Create and download text file
+                const blob = new Blob([billContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Amul-Bill-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // --- General Event Listeners ---
+            productListDiv.addEventListener('click', e => {
+                if (e.target.closest('.quantity-btn')) {
+                    const card = e.target.closest('.product-card');
+                    const quantitySpan = card.querySelector('.quantity-display');
+                    let quantity = parseInt(quantitySpan.textContent);
+                    if (e.target.closest('.plus-btn')) quantity++;
+                    else if (e.target.closest('.minus-btn') && quantity > 0) quantity--;
+                    quantitySpan.textContent = quantity;
+                    if (autoCalculateToggle.checked) calculateTotal();
+                } else if (e.target.closest('.category-header')) {
+                    const header = e.target.closest('.category-header');
+                    const content = document.querySelector(`.products-container[data-category-content="${header.dataset.category}"]`);
+                    header.classList.toggle('collapsed');
+                    content.classList.toggle('collapsed');
+                }
+            });
+            
+            searchInput.addEventListener('input', (e) => {
+                filterProducts(e.target.value);
+            });
+            
+            autoCalculateToggle.addEventListener('change', () => {
+                toggleCalculateButton();
+                if (autoCalculateToggle.checked) calculateTotal();
+            });
+            
+            calculateBtn.addEventListener('click', calculateTotal);
+            
+            resetBtn.addEventListener('click', () => {
+                document.querySelectorAll('.quantity-display').forEach(span => span.textContent = '0');
+                calculateTotal();
+                
+                // Add animation to reset button
+                resetBtn.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    resetBtn.style.transform = 'rotate(0deg)';
+                }, 500);
+            });
+            
+            closeHistoryBtn.addEventListener('click', () => historyModal.classList.remove('visible'));
+            
+            exportBtn.addEventListener('click', exportBill);
+            
+            themeToggleBtn.addEventListener('click', () => {
+                const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            // --- Initial App Setup ---
+            function initializeApp() {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                applyTheme(savedTheme);
+                displayProducts(productsData);
+                toggleCalculateButton();
+                
+                // Add animation delays to product cards
+                document.querySelectorAll('.product-card').forEach((card, index) => {
+                    card.style.animationDelay = `${index * 0.05}s`;
+                });
+            }
+
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
