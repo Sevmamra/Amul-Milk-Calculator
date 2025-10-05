@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amul Milk Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #e2001a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .product-categories {
+            display: flex;
+            overflow-x: auto;
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .category-btn {
+            padding: 8px 15px;
+            background-color: #ddd;
+            border: none;
+            border-radius: 20px;
+            margin-right: 10px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .category-btn.active {
+            background-color: #e2001a;
+            color: white;
+        }
+        
+        .products-container {
+            padding: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .product-category {
+            display: none;
+        }
+        
+        .product-category.active {
+            display: block;
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .product-price {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .quantity-input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .total-section {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #eee;
+        }
+        
+        .total-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .total-amount {
+            color: #e2001a;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn-calculate {
+            background-color: #e2001a;
+            color: white;
+        }
+        
+        .btn-reset {
+            background-color: #666;
+            color: white;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .quantity-input {
+                margin-top: 8px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Amul Milk Calculator</h1>
+            <p>Calculate distributor payments easily</p>
+        </header>
+        
+        <div class="product-categories">
+            <button class="category-btn active" data-category="milk">Milk</button>
+            <button class="category-btn" data-category="dahi">Dahi</button>
+            <button class="category-btn" data-category="buttermilk">Buttermilk</button>
+        </div>
+        
+        <div class="products-container">
+            <div class="product-category active" id="milk-category">
+                <!-- Milk products will be populated by JavaScript -->
+            </div>
+            
+            <div class="product-category" id="dahi-category">
+                <!-- Dahi products will be populated by JavaScript -->
+            </div>
+            
+            <div class="product-category" id="buttermilk-category">
+                <!-- Buttermilk products will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="total-section">
+            <div class="total-display">
+                <span>Total Amount:</span>
+                <span class="total-amount">₹0.00</span>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-calculate" id="calculate-btn">Calculate Total</button>
+                <button class="btn btn-reset" id="reset-btn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data
+        const products = {
+            milk: [
+                { name: "Amul Buffalo Milk 24x500 ml Pouch", price: 865.08 },
+                { name: "Amul Buffalo Milk 12x1 L Pouch", price: 865.08 },
+                { name: "Amul Gold 24 x 500 ml Pouch", price: 794.40 },
+                { name: "Amul Gold 12 x 1 Ltr Pouch", price: 782.40 },
+                { name: "Amul Gold 6x2 L Pouch Crate", price: 763.20 },
+                { name: "Amul Gold 2 x 6 Ltr Pouch", price: 751.32 },
+                { name: "Amul Shakti 24 x 500ml", price: 723.60 },
+                { name: "Amul T-Special 24 x 500 ml Pouch", price: 747.00 },
+                { name: "Amul T-Special 12 x 1 Ltr. Pouch", price: 735.00 },
+                { name: "Amul Cow Milk 24 x 500 ml. Pouch", price: 674.40 },
+                { name: "Amul Taaza 24 x 500 ml. Pouch", price: 650.76 },
+                { name: "Amul Taaza 12 x 1 ltr. Pouch", price: 638.76 },
+                { name: "Amul Taaza 2 x 6 ltr. Pouch", price: 597.84 },
+                { name: "Amul Taaza 60x160 ml Pouch", price: 552.00 },
+                { name: "Amul Chai Maaza 24 x 500 ml. Pouch", price: 650.76 },
+                { name: "Amul Chai Maaza 12 x 1 ltr. Pouch", price: 638.76 },
+                { name: "Amul Slim-n-Trim 24 x 500 ml. Pouch", price: 579.60 },
+                { name: "Amul Slim-n-Trim 12 x 1 L. Pouch", price: 567.60 }
+            ],
+            dahi: [
+                { name: "Amul Masti Dahi Cup 24x200 Gm Carton", price: 515.52 },
+                { name: "Amul Masti Dahi Cup 12x400 Gm Carton", price: 504.78 },
+                { name: "Amul Mishti Doi Cup 48x80 gm Carton", price: 612.00 },
+                { name: "Amul Masti Dahi Pouch 2X5 Kg Crate", price: 679.00 },
+                { name: "Amul Lite Dahi Pouch 2X5 Kg Crate", price: 535.57 },
+                { name: "Amul Masti Dahi 5 Kg Matka", price: 367.55 },
+                { name: "Amul Masti Dahi Pouch 30x390 Gm Crate", price: 950.25 },
+                { name: "Amul Masti Dahi Pouch 12x1 Kg Crate", price: 863.94 },
+                { name: "Amul Masti Dahi Pouch 60x200 gm Crate", price: 1080.00 },
+                { name: "Amul Masti Dahi Pouch 6x2 Kg Crate", price: 803.52 },
+                { name: "Amul A2 Buffalo Milk Dahi 24x200 Gm Cup", price: 672.00 },
+                { name: "Amul A2 Buffalo Milk Dahi 12x400 Gm Cup", price: 624.00 },
+                { name: "Amul Dahi Pouch 16x800 Gm Crate", price: 745.60 },
+                { name: "Amul Masti Dahi 2KgTub (2 Unit)", price: 360.00 }
+            ],
+            buttermilk: [
+                { name: "Amul Pro. Buttermilk 40x300 ml Pouch", price: 372.00 },
+                { name: "Amul Pro. Buttermilk 26x440 ml Pouch", price: 358.80 },
+                { name: "Amul Pro. Buttermilk 16x680 ml Pouch", price: 300.80 },
+                { name: "Amul Pro. Masala Chaas 40x280 ml Pouch", price: 360.00 },
+                { name: "Amul Pro. Tadka Chaas 40x280 ml Pouch", price: 360.00 },
+                { name: "Amul Satva Buttermilk 30x400 ml Pouch", price: 270.00 },
+                { name: "Amul Buttermilk 2*6 ltr Pouch", price: 316.80 }
+            ]
+        };
+
+        // DOM elements
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const productCategories = document.querySelectorAll('.product-category');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const totalAmount = document.querySelector('.total-amount');
+
+        // Initialize the app
+        function init() {
+            // Populate product lists
+            populateProductList('milk-category', products.milk);
+            populateProductList('dahi-category', products.dahi);
+            populateProductList('buttermilk-category', products.buttermilk);
+            
+            // Add event listeners
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', switchCategory);
+            });
+            
+            calculateBtn.addEventListener('click', calculateTotal);
+            resetBtn.addEventListener('click', resetAll);
+        }
+
+        // Populate product list for a category
+        function populateProductList(categoryId, products) {
+            const container = document.getElementById(categoryId);
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div class="no-products">No products available</div>';
+                return;
+            }
+            
+            products.forEach((product, index) => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">₹${product.price.toFixed(2)} per crate</div>
+                    </div>
+                    <input type="number" class="quantity-input" id="${categoryId}-${index}" min="0" value="0" placeholder="0">
+                `;
+                container.appendChild(productItem);
+            });
+        }
+
+        // Switch between product categories
+        function switchCategory(e) {
+            const category = e.target.getAttribute('data-category');
+            
+            // Update active button
+            categoryButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            
+            // Show selected category
+            productCategories.forEach(cat => {
+                cat.classList.remove('active');
+            });
+            document.getElementById(`${category}-category`).classList.add('active');
+        }
+
+        // Calculate total amount
+        function calculateTotal() {
+            let total = 0;
+            
+            // Calculate for milk products
+            products.milk.forEach((product, index) => {
+                const quantity = parseInt(document.getElementById(`milk-category-${index}`).value) || 0;
+                total += quantity * product.price;
+            });
+            
+            // Calculate for dahi products
+            products.dahi.forEach((product, index) => {
+                const quantity = parseInt(document.getElementById(`dahi-category-${index}`).value) || 0;
+                total += quantity * product.price;
+            });
+            
+            // Calculate for buttermilk products
+            products.buttermilk.forEach((product, index) => {
+                const quantity = parseInt(document.getElementById(`buttermilk-category-${index}`).value) || 0;
+                total += quantity * product.price;
+            });
+            
+            // Update total display
+            totalAmount.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        // Reset all inputs
+        function resetAll() {
+            const inputs = document.querySelectorAll('.quantity-input');
+            inputs.forEach(input => {
+                input.value = 0;
+            });
+            totalAmount.textContent = '₹0.00';
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
