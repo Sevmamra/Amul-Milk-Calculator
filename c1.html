@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Amul Milk Calculator — Mother Milk Palace</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#fbfbfb; --accent:#d81b60; --accent-dark:#b0174f;
+    --muted:#666; --success:#0b7a4d;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{background:linear-gradient(180deg,#fff 0%, #f7fbff 100%); padding:14px; color:#111;}
+  .app{max-width:820px;margin:0 auto;}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .logo{width:56px;height:56px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;}
+  h1{margin:0;font-size:18px}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .card{background:var(--card);border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 6px 18px rgba(15,15,15,0.04)}
+  .grid{display:grid;grid-template-columns:1fr 110px 110px;gap:8px;align-items:center}
+  .grid .name{font-weight:600}
+  .grid small{color:var(--muted);font-size:12px}
+  input.qty{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:16px;}
+  .price, .p-total{font-size:14px;color:var(--muted);text-align:right}
+  .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  button{padding:12px 14px;border-radius:10px;border:0;font-weight:700;font-size:15px;cursor:pointer}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(216,27,96,0.12)}
+  .btn-ghost{background:transparent;border:1px solid #e6e6e6;color:#222}
+  .totalbar{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;margin-top:12px;background:linear-gradient(90deg,#fff,#fff);font-weight:800}
+  .grand{font-size:20px;color:var(--accent-dark)}
+  footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+  .history-list{max-height:220px;overflow:auto;margin-top:10px;border-radius:8px;padding:8px;background:#fff;border:1px dashed #eee}
+  .history-item{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #fafafa;color:#333}
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr 110px 100px}
+    .logo{width:48px;height:48px}
+    h1{font-size:16px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">AMUL</div>
+    <div>
+      <h1>Amul Milk Calculator</h1>
+      <div class="sub">Mother Milk Palace — Daily distributor payment calculator</div>
+    </div>
+  </header>
+
+  <div id="productArea" class="card"></div>
+
+  <div class="card">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button id="calcBtn" class="btn-primary">Calculate Total</button>
+      <button id="resetBtn" class="btn-ghost">Reset</button>
+      <button id="saveBtn" class="btn-ghost">Save Today's Record</button>
+      <button id="showHistoryBtn" class="btn-ghost">Show History</button>
+    </div>
+
+    <div class="totalbar" style="margin-top:12px">
+      <div>Grand Total</div>
+      <div class="grand">₹ <span id="grandTotal">0.00</span></div>
+    </div>
+
+    <div id="historyPanel" style="display:none;margin-top:12px">
+      <div style="font-weight:700;margin-bottom:8px">Saved Records</div>
+      <div class="history-list" id="historyList"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="clearHistory" class="btn-ghost">Clear History</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Tip: Use "Add to Home Screen" in Safari to access quickly like an app.</footer>
+</div>
+
+<script>
+/* ========== Product Data (from user) ========== */
+const PRODUCTS = [
+  {id:'buff24_500', name:'Amul Buffalo Milk 24x500 ml Pouch', price:865.08},
+  {id:'buff12_1l',  name:'Amul Buffalo Milk 12x1 L Pouch', price:865.08},
+  {id:'gold24_500', name:'Amul Gold 24 x 500 ml Pouch', price:794.40},
+  {id:'gold12_1l',  name:'Amul Gold 12 x 1 Ltr Pouch', price:782.40},
+  {id:'gold6_2l',   name:'Amul Gold 6x2 L Pouch Crate', price:763.20},
+  {id:'gold2_6l',   name:'Amul Gold 2 x 6 Ltr Pouch', price:751.32},
+  {id:'shakti24',   name:'Amul Shakti 24 x 500ml', price:723.60},
+  {id:'tspec24',    name:'Amul T-Special 24 x 500 ml Pouch', price:747.00},
+  {id:'tspec12',    name:'Amul T-Special 12 x 1 Ltr. Pouch', price:735.00},
+  {id:'cow24',      name:'Amul Cow Milk 24 x 500 ml. Pouch', price:674.40},
+  {id:'taaza24',    name:'Amul Taaza 24 x 500 ml. Pouch', price:650.76},
+  {id:'taaza12',    name:'Amul Taaza 12 x 1 ltr. Pouch', price:638.76},
+  {id:'taaza2_6l',  name:'Amul Taaza 2 x 6 ltr. Pouch', price:597.84},
+  {id:'taaza60_160',name:'Amul Taaza 60x160 ml Pouch', price:552.00},
+  {id:'chai24',     name:'Amul Chai Maaza 24 x 500 ml. Pouch', price:650.76},
+  {id:'chai12',     name:'Amul Chai Maaza 12 x 1 ltr. Pouch', price:638.76},
+  {id:'slim24',     name:'Amul Slim-n-Trim 24 x 500 ml. Pouch', price:579.60},
+  {id:'slim12',     name:'Amul Slim-n-Trim 12 x 1 L. Pouch', price:567.60}
+];
+
+/* ========== Build UI ========== */
+const productArea = document.getElementById('productArea');
+
+function formatMoney(n){
+  // keep two decimals and fixed
+  return Number(n).toFixed(2);
+}
+
+function buildProducts(){
+  productArea.innerHTML = '';
+  PRODUCTS.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'grid';
+    row.style.marginBottom = '10px';
+    row.innerHTML = `
+      <div>
+        <div class="name">${p.name}</div>
+        <small>Price / crate: ₹ ${formatMoney(p.price)}</small>
+      </div>
+      <div>
+        <input inputmode="numeric" pattern="[0-9]*" class="qty" id="qty_${p.id}" placeholder="Qty (crates)" />
+      </div>
+      <div>
+        <div class="p-total" id="total_${p.id}">₹ 0.00</div>
+      </div>
+    `;
+    productArea.appendChild(row);
+    // add input listeners
+    const input = row.querySelector(`#qty_${p.id}`);
+    input.addEventListener('input', () => {
+      updateItemTotal(p.id);
+    });
+  });
+}
+
+function getQty(id){
+  const val = document.getElementById('qty_' + id).value.trim();
+  // accept floats but mostly integer crates; fallback 0
+  const num = parseFloat(val);
+  if (!isFinite(num) || num <= 0) return 0;
+  return num;
+}
+
+function updateItemTotal(id){
+  const prod = PRODUCTS.find(x => x.id === id);
+  const qty = getQty(id);
+  const total = qty * prod.price;
+  document.getElementById('total_' + id).textContent = '₹ ' + formatMoney(total);
+}
+
+/* ========== Calculate Grand Total ========== */
+function calculateGrandTotal(){
+  let grand = 0;
+  PRODUCTS.forEach(p => {
+    const qty = getQty(p.id);
+    const total = qty * p.price;
+    grand += total;
+    document.getElementById('total_' + p.id).textContent = '₹ ' + formatMoney(total);
+  });
+  document.getElementById('grandTotal').textContent = formatMoney(grand);
+  return grand;
+}
+
+/* ========== Reset ========== */
+function resetAll(){
+  PRODUCTS.forEach(p => {
+    document.getElementById('qty_' + p.id).value = '';
+    document.getElementById('total_' + p.id).textContent = '₹ 0.00';
+  });
+  document.getElementById('grandTotal').textContent = '0.00';
+}
+
+/* ========== Local Storage: Save / History ========== */
+const STORAGE_KEY = 'amul_milk_calc_records_v1';
+
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return [];
+  }
+}
+function saveHistory(records){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records || []));
+}
+
+function addRecord(amount){
+  const records = loadHistory();
+  const now = new Date();
+  const dateStr = now.toLocaleString(); // will follow user locale
+  records.unshift({date: dateStr, amount: Number(amount)});
+  // keep last 100 records max
+  if (records.length > 100) records.splice(100);
+  saveHistory(records);
+  renderHistory();
+}
+
+function renderHistory(){
+  const panel = document.getElementById('historyPanel');
+  const list = document.getElementById('historyList');
+  const records = loadHistory();
+  list.innerHTML = '';
+  if (records.length === 0){
+    list.innerHTML = '<div style="color:var(--muted);padding:8px">No saved records yet.</div>';
+    return;
+  }
+  records.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.innerHTML = `<div>${r.date}</div><div><strong>₹ ${formatMoney(r.amount)}</strong></div>`;
+    list.appendChild(el);
+  });
+}
+
+/* ========== Wire buttons ========== */
+document.getElementById('calcBtn').addEventListener('click', () => {
+  const total = calculateGrandTotal();
+  // small visual feedback
+  document.getElementById('grandTotal').style.transform = 'scale(1.02)';
+  setTimeout(()=> document.getElementById('grandTotal').style.transform = 'none',180);
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Clear all quantities?')) resetAll();
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const total = calculateGrandTotal();
+  addRecord(total);
+  alert('Record saved: ₹ ' + formatMoney(total));
+});
+
+document.getElementById('showHistoryBtn').addEventListener('click', () => {
+  const panel = document.getElementById('historyPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  renderHistory();
+});
+
+document.getElementById('clearHistory').addEventListener('click', () => {
+  if (confirm('Delete all saved records?')) {
+    saveHistory([]);
+    renderHistory();
+  }
+});
+
+/* ========== Init ========== */
+buildProducts();
+renderHistory();
+</script>
+</body>
+</html>
