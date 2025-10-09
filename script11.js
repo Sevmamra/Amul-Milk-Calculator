@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initializeApp = async () => {
         applyTheme(localStorage.getItem('theme') || 'dark');
         try {
-            const response = await fetch('products.json');
+            const response = await fetch('products11.json');
             allProducts = await response.json();
             displayProducts();
         } catch (error) {
