@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Amul Milk Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="dark-mode">
+
+    <header class="header">
+        <img src="header-title.png" alt="Amul Title" class="title-img">
+    </header>
+
+    <div class="container pb-40">
+        <div class="controls">
+            <input type="search" id="search-input" class="search-input" placeholder="Search product...">
+            <div class="control-buttons">
+                <div style="text-align: center;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-calculate" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <div class="auto-calc-label">Auto</div>
+                </div>
+                <button id="settings-btn" class="btn-icon" title="Settings"><i class="fas fa-cog"></i></button>
+                <button id="load-last-order-btn" class="btn-icon" title="Load Last Order"><i class="fas fa-history"></i></button>
+                <button id="history-btn" class="btn-icon" title="History"><i class="fas fa-list-alt"></i></button>
+            </div>
+        </div>
+
+        <div id="product-list"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="total-container">
+            <span class="total-label">Total Amount:</span>
+            <span id="total-amount" class="total-amount">₹ 0.00</span>
+        </div>
+        <div class="action-buttons">
+            <button id="reset-btn" class="btn-side" title="Reset"><i class="fas fa-redo"></i></button>
+            <button id="calculate-btn" class="btn-main hidden"><i class="fas fa-calculator"></i> Calculate</button>
+            <button id="save-btn" class="btn-side" title="Save"><i class="fas fa-save"></i></button>
+        </div>
+    </footer>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Saved History</h2>
+                <button id="close-history" class="btn-icon">&times;</button>
+            </div>
+            <div class="history-filters">
+                <input type="date" id="start-date-filter">
+                <input type="date" id="end-date-filter">
+                <button id="apply-filter-btn" class="btn-filter">Filter</button>
+            </div>
+            <div class="history-actions">
+                <button id="select-all-history-btn">Select All</button>
+                <button id="delete-selected-history-btn">Delete Selected</button>
+                <button id="download-csv-btn">Download CSV</button>
+            </div>
+            <div id="history-list" class="modal-body"></div>
+        </div>
+    </div>
+    
+    <div id="order-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Order Details</h2>
+                <button id="close-order-details" class="btn-icon">&times;</button>
+            </div>
+            <div id="order-details-list" class="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <button id="close-settings" class="btn-icon">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-section">
+                    <h3>Theme</h3>
+                    <button id="theme-toggle-btn" class="btn-main"><i class="fas fa-sun"></i> Toggle Theme</button>
+                </div>
+                <div class="setting-section">
+                    <h3>Manage Products</h3>
+                    <div id="manage-product-list"></div>
+                    <form id="add-product-form">
+                        <input type="text" id="product-name" placeholder="Product Name" required>
+                        <input type="text" id="product-size" placeholder="Size (e.g., 500ml)" required>
+                        <input type="number" id="product-price" placeholder="Price" step="0.01" required>
+                        <input type="text" id="product-category" placeholder="Category" required>
+                        <button type="submit" class="btn-main">Add New Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Action complete!</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
