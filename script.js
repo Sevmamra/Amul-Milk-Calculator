@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- ELEMENT SELECTORS ---
+    // --- ELEMENT SELECTORs ---
     const elements = {
         productListDiv: document.getElementById('product-list'),
         autoCalculateToggle: document.getElementById('auto-calculate'),
